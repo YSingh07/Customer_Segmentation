@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Segmentation Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <header class="dashboard-header">
+            <div>
+                <h1>Customer Segmentation Dashboard</h1>
+                <p>Understand customer groups using K-Means</p>
+            </div>
+
+            <a class="nav-button" href="/">Predict Customer</a>
+        </header>
+
+        <!-- Statistics cards -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <h3>Total Customers</h3>
+                <p>{{ total_customers }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Customer Segments</h3>
+                <p>{{ num_clusters }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Average Annual Income</h3>
+                <p>${{ "{:,.0f}".format(avg_income * 1000) }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Average Spending Score</h3>
+                <p>{{ "%.2f"|format(avg_spending) }}</p>
+            </div>
+
+        </section>
+
+        <!-- Cluster chart -->
+        <section class="panel">
+            <h2>Customers in Each Cluster</h2>
+            <canvas id="clusterChart"></canvas>
+        </section>
+
+        <!-- Cluster summary table -->
+        <section class="panel">
+            <h2>Cluster Characteristics</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cluster</th>
+                            <th>Segment Name</th>
+                            <th>Customers</th>
+                            <th>Average Income (k$)</th>
+                            <th>Average Spending</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for row in summary %}
+                        <tr>
+                            <td>Cluster {{ row["Cluster"] }}</td>
+                            <td>{{ row["Segment_Name"] }}</td>
+                            <td>{{ row["Customer_Count"] }}</td>
+                            <td>{{ "%.2f"|format(row["Average_Income"]) }}</td>
+                            <td>{{ "%.2f"|format(row["Average_Spending"]) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const clusterLabels = {{ chart_labels | tojson }};
+        const clusterCounts = {{ chart_values | tojson }};
+
+        const chartCanvas = document.getElementById("clusterChart");
+
+        new Chart(chartCanvas, {
+            type: "bar",
+
+            data: {
+                labels: clusterLabels,
+
+                datasets: [{
+                    label: "Number of Customers",
+                    data: clusterCounts,
+                    backgroundColor: [
+                        "#4776e6",
+                        "#45b7a5",
+                        "#f4b942",
+                        "#e87979",
+                        "#9270db"
+                    ],
+                    borderRadius: 6
+                }]
+            },
+
+            options: {
+                responsive: true,
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        title: {
+                            display: true,
+                            text: "Number of Customers"
+                        }
+                    },
+
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Cluster Number"
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

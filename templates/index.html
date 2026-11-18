@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Segmentation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Customer Segmentation System</h1>
+        <p class="subtitle">
+            Discover customer groups using Machine Learning
+        </p>
+
+        <form method="POST">
+            <label for="income">Annual Income (in thousand dollars)</label>
+            <input
+                type="number"
+                id="income"
+                name="income"
+                min="0"
+                max="1000"
+                step="any"
+                required
+                placeholder="Example: 50"
+            >
+
+            <label for="spending">Spending Score (1–100)</label>
+            <input
+                type="number"
+                id="spending"
+                name="spending"
+                min="1"
+                max="100"
+                required
+                placeholder="Example: 75"
+            >
+
+            <button type="submit">Predict Customer Segment</button>
+            
+
+            
+        </form>
+        
+
+        
+        {% if prediction %}
+            <div class="result">
+                <h2>Prediction Result</h2>
+
+                <p>Your customer belongs to:</p>
+
+                <h3>Cluster {{ prediction.cluster }}</h3>
+
+                <p class="segment-name">
+                    {{ prediction.segment_name }}
+                </p>
+
+                <p>
+                    Annual income:
+                        ${{ "{:,.2f}".format(prediction.income * 1000) }}
+                </p>
+
+                <p>Spending score: {{ prediction.spending }}</p>
+            </div>
+        {% endif %}
+
+
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+    </div>
+    
+    <div>
+        <a class="nav-button" href="/dashboard" style="margin-left:45% ;" >Back to Dashboard</a>
+    </div>
+
+</body>
+</html>
